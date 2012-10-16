@@ -115,6 +115,12 @@
 Class.number = 1;</code></pre>
             <ul>
                 <li class="fragment">must provide Class.number to use externally (enums)</li>
+<pre class="fragment"><code>goog.provide('Class.Number')
+/** @enum {number} */
+Class.Number = {
+    ONE: 1,
+    TWO: 2
+};</code></pre>
                 <li class="fragment">provide access through prototype</li>
                 <li class="fragment">put under another namespace</li>
             </ul>
@@ -178,9 +184,9 @@ goog.require('othernamespace');
 </code></pre>
             <div class="fragment">uncompiled</div>
             <ul class="fragment">
-                <li>provide will create the objects needed for the namespace if they don't exist</li>
-                <li>require will write in the dependency if it hasn't been already</li>
-                <li>a file should be created matching up namespaces to files (depswriter.py - or let plovr do it)</li>
+                <li>goog.provide will create the objects needed for the namespace if they don't exist</li>
+                <li>goog.require calls in files from goog.addDependency if not already done</li>
+                <li>Need the goog.addDependecy file made using depswriter.py<span class="fragment">... or let plovr do it</span></li>
             </ul>
             <div class="fragment">compiled</div>
             <ul class="fragment">
@@ -193,11 +199,13 @@ goog.require('othernamespace');
         <section>
             <h2>goog.ui.component</h2>
             <ul>
-                <li>What we build our application out of</li>
-                <li>javascript as it's added - <a href="https://plus.google.com/116910304844117268718/posts/UkaymyuTzaF">no more  waiting for $(documnet).ready</a></li>
-                <li>Control those zombie references (extends <a href="http://closure-library.googlecode.com/svn/docs/class_goog_Disposable.html">disposable</a> &amp; <a href="http://closure-library.googlecode.com/svn/docs/class_goog_events_EventTarget.html">eventTarget</a>)</li>
-                <li>Can render new HTML and/or Decorate existing DOM structure</li>
-                <li>Create a heirarchy</li>
+                <li class="fragment">What we build our application out of</li>
+                <li class="fragment">javascript as it's added - <a href="https://plus.google.com/116910304844117268718/posts/UkaymyuTzaF">no more  waiting for $(document).ready</a></li>
+                <li class="fragment">Control those zombie references (extends <a href="http://closure-library.googlecode.com/svn/docs/class_goog_Disposable.html">disposable</a> &amp; <a href="http://closure-library.googlecode.com/svn/docs/class_goog_events_EventTarget.html">eventTarget</a>)</li>
+                <li class="fragment">this.getHandler().listen instead of goog.events.listen</li>
+                <li class="fragment">Create a heirarchy</li>
+                <li class="fragment">Can render new HTML and/or Decorate existing DOM structure</li>
+                <li class="fragment"><a href="http://code.google.com/p/closure-library/wiki/IntroToComponents">more on the lifecycle</a> or read the book</li>
             </ul>
         </section>
         <section>
@@ -251,17 +259,29 @@ goog.require('othernamespace');
                 <li>removeChild(child, opt_unrender);</li>
                 <ul>
                     <li>Optionally call exitDocument and remove node</li>
+                    <li>if (opt_unrender) exitDocument();</li>
                 </ul>
+            </ul>
+        </section>
+        <section>
+            <h2>goog.ui.component</h2>
+            <div>so...</div>
+            <ul>
+                <li class="fragment">createDom for DOM creation</li>
+                <li class="fragment">canDecorate and decorateInternal for decorating existing structure</li>
+                <li class="fragment">enterDocument to setup handlers (<font color="#ff0099">use this.getHandler()</font>)</li>
+                <li class="fragment">exitDocument to cleanup enterDocument (<font color="#ff0099">if you need to</font>)</li>
+                <li class="fragment">disposeInternal for dispose that should only happen once</li>
             </ul>
         </section>
     </section>
     <section>
-        <h2>WeatherDemo</h2>
+        <h2><a href="https://github.com/rhysbrettbowen/weatherdemo">WeatherDemo</a></h2>
         <h3>Now we've got the basics - let's code!</h3>
         <ul>
             <li>Displays cities with temperature</li>
             <li>Temperature in farenheit and celcius</li>
-            <li>Can change city name and temperature</li>
+            <li>Can change city temperature</li>
             <li>Can add new cities</li>
             <li>Display cities in alpha or temp order</li>
             <li>Display blue or red if temperature is cold or hot</li>
@@ -361,7 +381,7 @@ $('.class').children().addClass('classChilren');
                 <li><a href="http://sizzlejs.com">Sizzle</a></li>
                 <li><a href="https://github.com/ded/qwery">Qwery</a></li>
             </ul>
-            <li class="fragment">Even some jQuery plugins may work - just add to $.fn</li>
+            <li class="fragment">Even some (simple) jQuery plugins may work - just add to $$.fn</li>
         </ul>
     </section>
     <section>
@@ -370,11 +390,12 @@ $('.class').children().addClass('classChilren');
             <div>MVC for Closure Library</div>
             <ul>
                 <li>Define schemas on models</li>
-                <li>Controls built on goog.ui.component</li>
+                <li>Controls built on goog.ui.Component</li>
                 <li>Control level event system</li>
                 <li>Convenient model bindings</li>
                 <li>Mediator</li>
                 <li>Store</li>
+                <li class="fragment">also router and syncs</li>
             </ul>
         </section>
         <section>
@@ -391,10 +412,9 @@ $('.class').children().addClass('classChilren');
     require: ['temp']
   }
 };</code></pre>
-            <ul class="fragment">
-                <li>models: true</li>
-                <li>cmp: function(*, *): boolean</li>
-            </ul>
+<div class="fragment">or convenience functions
+<pre><code>this.alias('farenheit', 'temp');</code></pre></div>
+            <div class="fragment">read <a href="https://github.com/rhysbrettbowen/PlastronJS/blob/master/README.md">documentation</a> for more</div>
         </section>
         <section>
             <h2>Using inheritance</h2>
@@ -452,9 +472,9 @@ goog.inherits(WeatherDemo.control.Single, mvc.Control);</code></pre>
                     <li>this.anyModelChange - mvc.Collection</li>
                 </ul>
                 <li class="fragment">autmoatically clears bindings when disposed</li>
-                <li class="fragment">setModel() will change bindings to the new model</li>
+                <li class="fragment">setModel() will change bindings to the new model
+<pre><code>single.setModel(WeatherDemo.Store.get(id));</code></pre></li>
             </ul>
-<pre class="fragment"><code>single.setModel(WeatherDemo.Store.get(id));</code></pre>
         </section>
         <section>
             <h2>Autobind!</h2>
@@ -549,6 +569,22 @@ this.broadcast('chooseCity', this.getModel().get('id'));</code></pre>
             </ul>
         </section>
         <section>
+            <h2>Linting</h2>
+            <div class="fragment">gjslint -r js</div>
+<pre class="fragment"><code>
+...
+Found 17 errors, including 1 new errors, in 7 files (0 files OK).
+
+... The script can be run by executing: fixjsstyle -r js 
+</code></pre>
+        <div class="fragment">fixjsstyle -r js</div>
+        <br />
+        <div class="fragment">gjslint -r js</div>
+<pre class="fragment"><code>...
+Found 8 errors, including 0 new errors, in 5 files (2 files OK).
+</code></pre>
+        </section>
+        <section>
             <h2><a href="http://code.google.com/p/closure-stylesheets/">Closure Stylesheets</a></h2>
             <ul>
                 <li>Variables</li>
@@ -576,22 +612,6 @@ goog.getCssName('class-subclass') ==
 
 $(goog.getCssName('-class'));</code></pre>
         </section>
-        <section>
-            <h2>Linting</h2>
-            <div class="fragment">gjslint -r js</div>
-<pre class="fragment"><code>
-...
-Found 17 errors, including 1 new errors, in 7 files (0 files OK).
-
-... The script can be run by executing: fixjsstyle -r js 
-</code></pre>
-        <div class="fragment">fixjsstyle -r js</div>
-        <br />
-        <div class="fragment">gjslint -r js</div>
-<pre class="fragment"><code>...
-Found 8 errors, including 0 new errors, in 5 files (2 files OK).
-</code></pre>
-        </section>
     </section>
     <section>
         <section>
@@ -614,240 +634,15 @@ Found 8 errors, including 0 new errors, in 5 files (2 files OK).
     </section>
     <section>
         <h2>Questions?</h2>
-        <div>Rhys Brett-Bowen</div>
+        <div><a href="http://rhysbrettbowen.github.com/closure_from_jquery/">http://rhysbrettbowen.github.com/closure_from_jquery/</a></div>
+        <br />
         <ul>
             <li><a href="http://rhysbrettbowen.com">http://rhysbrettbowen.com</a></li>
-            <li>twitter: <a href="https://twitter.com/RhysBB">@RhysBB</a></li>
+            <li><a href="https://twitter.com/RhysBB">@RhysBB</a></li>
             <li><a href="https://plus.google.com/109445215696684436299">Google+</a></li>
         </ul>
     </section>
 
-    <!--
-    <section>
-        <section>
-            <h2>Closure Tools</h2>
-            <div>
-                <a href="https://developers.google.com/closure/compiler/">Closure Compiler</a>
-            </div>
-            <ul>
-                <li>Aggressive renaming</li>
-                <li>Dead code removal</li>
-                <li>Function inlining</li>
-            </ul>
-        </section>
-        <section>
-            <h2>Closure Tools</h2>
-            <div><a href="https://developers.google.com/closure/library">Closure Library</a></div>
-            <ul>
-                <li>Namespaces</li>
-                <li>Dependancy management</li>
-                <li>Inheritance</li>
-                <li>goog.ui.component (later)</li>
-            </ul>
-        </section>
-        <section>
-            <h2>Closure Tools</h2>
-            <div><a href="https://developers.google.com/closure/templates">Closure Templates</a></div>
-            <ul>
-                <li>Compiled</li>
-                <li>Extensible functions</li>
-                <li>Client and Server-side</li>
-                <li>Translatable strings</li>
-            </ul>
-        </section>
-        <section>
-            <h2>Closure Tools</h2>
-            <div><a href="http://code.google.com/p/closure-stylesheets/">Closure Stylesheets</a></div>
-            <ul>
-                <li>Variables</li>
-                <li>Extensible functions</li>
-                <li>Mixins</li>
-                <li>Conditionals</li>
-                <li>Minification (<font color="#ff0099">including class name</font>)</li>
-                <li>Linting</li>
-            </ul>
-        </section>
-        <section>
-            <h2>Closure Tools</h2>
-            <div><a href="https://developers.google.com/closure/utilities">Closure Linter</a></div>
-            <ul>
-                <li>lints for the <a href="http://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml">Google Javascript Style Guide</a></li>
-                <li>Strict mode for contributing to Closure Library</li>
-                <li>Style fixer</li>
-            </ul>
-        </section>
-    </section>
-    <section>
-        <h2>Why do you care?</h2>
-        <div>ADVANCED Optimizations</div>
-        <ul>
-            <li class="fragment">More code - less bytes</li>
-            <li class="fragment">We can be verbose - the code won't be</li>
-            <li class="fragment">We can use longer name(space)s</li>
-            <li class="fragment">Unused code is removed</li>
-            <li class="fragment">Code will run faster</li>
-        </ul>
-    </section>
-    <section>
-        <h2>What's the catch</h2>
-        <div>Code must be AO compatible</div>
-        <ul class="fragment">
-            <li>foo['bar'] !== foo.bar</li>
-            <li>{foo: 'bar'} becomes {a: 'bar'}</li>
-            <li>but {'foo': 'bar'} stays {'foo': 'bar'}</li>
-        </ul>
-        <div class="fragment">Use property when internal only and strings when value is external</div>
-        <div class="fragment">What about using libraries that aren't compatible...</div>
-    </section>
-    <section>
-        <h2>Closure Library</h2>
-        <ul>
-            <li>AO compatible</li>
-            <li>Namespaced</li>
-            <li>Designed to compress well</li>
-            <li>Backwards compatible</li>
-            <li>Built to work with the compiler</li>
-            <ul>
-                <li>Dependancy management</li>
-                <li>Type annotations</li>
-            </ul>
-        </ul>
-    </section>
-    <section>
-        <section>
-            <h2>goog.ui.component</h2>
-            <div>Render</div>
-            <ul>
-                <li>render()</li>
-                <ul>
-                    <li>createDom()</li>
-                    <li>enterDocument()</li>
-                </ul>
-            </ul>
-            <div>... some time later ...</div>
-            <ul>
-                <li>dispose()</li>
-                <ul>
-                    <li>disposeInternal()</li>
-                    <li>exitDocument()</li>
-                </ul>
-            </ul>
-        </section>
-        <section>
-            <h2>goog.ui.component</h2>
-            <div>Decorate</div>
-            <ul>
-                <li>decorate()</li>
-                <ul>
-                    <li>canDecorate()</li>
-                    <li>decorateInternal()</li>
-                    <li>enterDocument()</li>
-                </ul>
-            </ul>
-            <div>... some time later ...</div>
-            <ul>
-                <li>dispose()</li>
-                <ul>
-                    <li>disposeInternal()</li>
-                    <li>exitDocument()</li>
-                </ul>
-            </ul>
-        </section>
-        <section>
-            <h2>goog.ui.component</h2>
-            <div>Children</div>
-            <ul>
-                <li>addChild(child, opt_render);</li>
-                <ul>
-                    <li>Will render to getContentElement()</li>
-                    <li>Optionally render manually to another element</li>
-                    <li>Calls addChildAt(child, index, opt_render)</li>
-                </ul>
-                <li>removeChild(child, opt_unrender);</li>
-                <ul>
-                    <li>Optionally call exitDocument and remove node</li>
-                </ul>
-            </ul>
-        </section>
-    </section>
-    <section>
-        <h2>Plovr</h2>
-        <ul>
-            <li class="fragment">bundles compiler, templates and library</li>
-            <li class="fragment">Simple configuration</li>
-            <li class="fragment">test runner</li>
-            <li class="fragment">documentation generation</li>
-            <li class="fragment">modules</li>
-        </ul>
-    </section>
-    <section>
-        <section>
-            <h2>Learn a new library?</h2>
-            <div>jQuery is a good interface</div>
-            <pre><code contenteditable>
-$('.class').children().addClass('classChilren');
-            </code></pre>
-        </section>
-        <section>
-            <h2>Learn a new library?</h2>
-            <div>Closure Library...</div>
-            <pre><code contenteditable>
-goog.array.forEach(
-    goog.dom.getChildren(goog.dom.getElementByClass('class')),
-        function(child) {
-            goog.dom.classes.add(child, 'classChildren');
-        });
-            </code></pre>
-        </section>
-        <section>
-            <h2>Learn a new library?</h2>
-            <div>The G!</div>
-            <pre><code contenteditable>
-$('.class').children().addClass('classChilren');
-            </code></pre>
-        </section>
-    </section>
-    <section>
-        <h2>PlastronJS</h2>
-        <div>MVC framework built on Closure Tools</div>
-        <ul>
-            <li>Define schemas on models</li>
-            <li>Controls built on goog.ui.component</li>
-            <li>Control level event system</li>
-            <li>Bound event objects</li>
-            <li>Convenience methods</li>
-            <li>Mediator</li>
-            <li>Store</li>
-        </ul>
-    </section>
-    <section>
-        <h1>Let's see some code</h1>
-    </section>
-    <section>
-        <h2>Class minification</h2>
-        <ul>
-            <li>Use Closure Stylesheets (coming soon in plovr)</li>
-            <li>'-' separator</li>
-            <li>goog.getCssName()</li>
-        </ul>
-<pre><code contenteditable>// renaming separated by -
-
-goog.getCssName('class-subclass') ==
-    goog.getCssName('class') + '-' + goog.getCssName('sublcass');
-
-// select by class in The G and PlastronJS
-
-$(goog.getCssName('-class'));
-</code></pre>
-    </section>
-    <section>
-        <h2>What's next?</h2>
-        <ul>
-            <li>Join the <a href="http://www.meetup.com/Closure-Tools/">Meetup</a></li>
-            <li>Discuss on the <a href="https://groups.google.com/forum/?fromgroups#!forum/closure-library-discuss">boards</a></li>
-            <li>Read the <a href="http://closure-library.googlecode.com/svn/docs/index.html">documentation</a> (use file index)</li>
-        </ul>
-    </section> -->
     
 </div>
 
