@@ -65,6 +65,16 @@
         </ul>
     </section>
     <section>
+        <h2>Who are you?</h2>
+        <ul>
+            <li class="fragment">Heard of Closure?</li>
+            <li class="fragment">Tried Closure?</li>
+            <li class="fragment">... and gave up?</li>
+            <li class="fragment">know jQuery?</li>
+            <li class="fragment">how about an MV*?</li>
+        </ul>
+    </section>
+    <section>
         <section>
             <h2>Closure Compiler</h2>
             <h3>Advanced Optimizations</h3>
@@ -113,6 +123,9 @@ Class.number = 1;</code></pre>
             <h2>What about using libraries that aren't compatible...</h2>
             <ul>
                 <li><a href="https://developers.google.com/closure/compiler/docs/api-tutorial3#externs">externs</a></li>
+                <ul>
+                    <li><a href="http://code.google.com/p/closure-compiler/source/browse/trunk/contrib/externs/">some extern files</a></li>
+                </ul>
                 <li>Closure Library</li>
             </ul>
         </section>
@@ -136,10 +149,17 @@ goog.require('Super');
  * @constructor
  * @extends {Super}
  */
-Class = function() {};
+Class = function() {
+    goog.base(this);
+};
 goog.inherits(Class, Super);
 
-Class.prototype.method = function() {};
+/**
+ * @inheritDoc
+ */
+Class.prototype.method = function(arg) {
+    return goog.base(this, 'method', arg);
+};
 </code></pre>
         </section>
         <section>
@@ -149,21 +169,37 @@ Class.prototype.method = function() {};
                 <li>Optional... mostly</li>
                 <li>Don't need to be explicit</li>
             </ul>
+            <div class="fragment">We'll see some in the code</div>
         </section>
         <section>
             <h2>Dependency management</h2>
 <pre><code>goog.provide('namespace');
 goog.require('othernamespace');
 </code></pre>
+            <div class="fragment">uncompiled</div>
             <ul class="fragment">
-                <li>provide creates the object and registers the file</li>
-                <li>require helps the compiler find the file</li>
-                <li>compiler creates the dependency graph</li>
+                <li>provide will create the objects needed for the namespace if they don't exist</li>
+                <li>require will write in the dependency if it hasn't been already</li>
+                <li>a file should be created matching up namespaces to files (depswriter.py - or let plovr do it)</li>
             </ul>
-            <div class="fragment">runtime dependencies? try <a href="http://rhysbrettbowen.com/2012/10/dependency-injection-in-closure-ioc.html">this</a></div>
+            <div class="fragment">compiled</div>
+            <ul class="fragment">
+                <li>compiler will include all dependencies in a single file in the correct order</li>
+            </ul>
+            <div class="fragment">want Dependency Injection? try <a href="http://rhysbrettbowen.com/2012/10/dependency-injection-in-closure-ioc.html">Loader</a></div>
         </section>
     </section>
     <section>
+        <section>
+            <h2>goog.ui.component</h2>
+            <ul>
+                <li>What we build our application out of</li>
+                <li>javascript as it's added - <a href="https://plus.google.com/116910304844117268718/posts/UkaymyuTzaF">no more  waiting for $(documnet).ready</a></li>
+                <li>Control those zombie references (extends <a href="http://closure-library.googlecode.com/svn/docs/class_goog_Disposable.html">disposable</a> &amp; <a href="http://closure-library.googlecode.com/svn/docs/class_goog_events_EventTarget.html">eventTarget</a>)</li>
+                <li>Can render new HTML and/or Decorate existing DOM structure</li>
+                <li>Create a heirarchy</li>
+            </ul>
+        </section>
         <section>
             <h2>goog.ui.component</h2>
             <div>Render</div>
@@ -211,7 +247,6 @@ goog.require('othernamespace');
                 <ul>
                     <li>Will render to getContentElement()</li>
                     <li>Optionally render manually to another element</li>
-                    <li>Calls addChildAt(child, index, opt_render)</li>
                 </ul>
                 <li>removeChild(child, opt_unrender);</li>
                 <ul>
@@ -229,7 +264,7 @@ goog.require('othernamespace');
             <li>Can change city name and temperature</li>
             <li>Can add new cities</li>
             <li>Display cities in alpha or temp order</li>
-            <li>Display blue or red is temperature is cold or hot</li>
+            <li>Display blue or red if temperature is cold or hot</li>
             <li>Use temperature to place city on X-axis</li>
         </ul>
     </section>
@@ -239,9 +274,9 @@ goog.require('othernamespace');
             <ul>
                 <li class="fragment">bundles compiler, templates and library</li>
                 <li class="fragment">Simple configuration</li>
-                <li class="fragment">test runner</li>
-                <li class="fragment">documentation generation</li>
-                <li class="fragment">modules</li>
+                <li class="fragment">Test runner</li>
+                <li class="fragment">Documentation generation</li>
+                <li class="fragment">Modules</li>
             </ul>
         </section>
         <section>
@@ -251,17 +286,24 @@ goog.require('othernamespace');
     "paths": ["js/", "lib/", "templates/"],
     "inputs": "js/main.js",
     "mode": "ADVANCED",
-    "level": "VERBOSE"
+    "level": "VERBOSE",
+    "output_file": "compiled.js"
 }</code></pre>
         </section>
         <section>
             <h2>add in to project</h2>
-            <div>add in to index.html</div>
+            <div class="fragment">
+                <div>add in to index.html</div>
 <pre><code>&lt;!-- or mode=compile -->
 &lt;script src="http://localhost:9810/compile?id=weatherdemo&mode=raw">&lt;/script></code></pre>
-            <div>run from the command line</div>
+                <div>run from the command line</div>
 <pre><code>java -jar plovr.jar serve weatherdemo.json</code></pre>
-            <div>Done!</div>
+                <div>Done!</div>
+            </div>
+            <div class="fragment">
+                <div>... or create the compiled js file</div>
+<pre><code>java -jar plovr.jar build weatherdemo.json</code></pre>
+            </div>
         </section>
     </section>
     <section>
@@ -330,7 +372,6 @@ $('.class').children().addClass('classChilren');
                 <li>Define schemas on models</li>
                 <li>Controls built on goog.ui.component</li>
                 <li>Control level event system</li>
-                <li>Bound event objects</li>
                 <li>Convenient model bindings</li>
                 <li>Mediator</li>
                 <li>Store</li>
@@ -392,9 +433,13 @@ goog.inherits(WeatherDemo.control.Single, mvc.Control);</code></pre>
                 <li class="fragment">Handlers are fired based on priority first (then order)</li>
                 <li class="fragment">returns an object that can .fire() the handler and .off()</li>
             </ul>
-<pre class="fragment"><code>this.on(eventType, fn, opt_selector, opt_handler,
-    opt_priority // lower is more important
-).fire(); // run the function</code></pre>
+<pre class="fragment"><code>this.on(eventType, fn, opt_selector, opt_handler, opt_priority).fire();</code></pre>
+<pre class="fragment"><code>this.click(function() { this.broadcast('chooseCity', this.getModel().get('id'));});</code></pre>
+<pre class="fragment"><code>this.on(goog.events.EventType.KEYUP, function(e) {
+    if (e.keyCode === goog.events.KeyCodes.ENTER) {
+      e.target.blur();
+    }
+  }, 'input');</code></pre>
         </section>
         <section>
             <h2>Convenient model bindings</h2>
@@ -409,38 +454,67 @@ goog.inherits(WeatherDemo.control.Single, mvc.Control);</code></pre>
                 <li class="fragment">autmoatically clears bindings when disposed</li>
                 <li class="fragment">setModel() will change bindings to the new model</li>
             </ul>
+<pre class="fragment"><code>single.setModel(WeatherDemo.Store.get(id));</code></pre>
+        </section>
+        <section>
+            <h2>Autobind!</h2>
+            <div>two way binding configuration</div>
+            <ul>
+                <li>can take a template string or object</li>
+                <li>can bind:</li>
+                <ul>
+                    <li>classes</li>
+                    <li>html</li>
+                    <li>visibility</li>
+                </ul>
+            </ul>
+<pre class="fragment"><code>this.autobind('.temp', '{$temp}');</code></pre>
+<pre class="fragment"><code>this.autobind('', {
+    reqs: ['celcius'],
+    reqClass: ['hot', 'mild'],
+    chooseClass: function(celcius) {
+      if (celcius > 30) return 'hot';
+      if (celcius < 20) return 'mild';
+    }
+});</code></pre>
+        </section>
+        <section>
+            <h2>Autolist!</h2>
+            <ul>
+                <li>automatically keep list up to date on screen</li>
+                <li>can override display with placeChild_</li>
+            </ul>
+<pre class="fragment"><code>this.autolist(WeatherDemo.control.Simple, content);</code></pre>
+<pre class="fragment"><code>WeatherDemo.control.List.prototype.placeChild_ = function(
+    contentEl, child, index) {
+  $(child.getElement()).css({
+    'top': index * 45
+  });
+};</code></pre>
         </section>
         <section>
             <h2>Mediator</h2>
             <ul>
                 <li>app wide messaging</li>
                 <li>namespace messages</li>
-                <li>message matching with wildcards</li>
-                <ul>
-                    <li>'%' for matching within level, '*' for any string</li>
-                    <li>'abc.def.ghi.jkl' matches 'abc.%.def.*'</li>
-                </ul>
-                <li>customizable tokens</li>
                 <li>can register objects to broadcast, then will decorate with broadcast method</li>
                 <li>can initialize and dispose based on available message</li>
+                <li>message matching with customizable wildcards</li>                
             </ul>
+<pre class="fragment"><code>WeatherDemo.Mediator.register(this, 'chooseCity');
+// then
+this.broadcast('chooseCity', this.getModel().get('id'));</code></pre>
+<pre class="fragment"><code>WeatherDemo.Mediator.on('chooseCity', function(id) {...});</code></pre>
         </section>
         <section>
             <h2>Store</h2>
             <ul>
-                <li>single store for retrival of models</li>
+                <li>single store for retrieval of models</li>
                 <li>can create models given a type</li>
                 <li>will retrieve models given an id (and update new models id when given)</li>
             </ul>
-        </section>
-        <section>
-            <h2>Sync</h2>
-            <ul>
-                <li>matches model and datastore</li>
-                <li>basic Ajax and Local stores provided</li>
-                <li>see <a href="http://todomvc.com/labs/architecture-examples/plastronjs/">todomvc</a> for a demonstration of local</li>
-                <li>use save() and fetch() to sync model changes</li>
-            </ul>
+<pre class="fragment"><code>WeatherDemo.Store = new mvc.Store(WeatherDemo.model.City);</code></pre>
+<pre class="fragment"><code>WeatherDemo.Store.get(city['id']);</code></pre>
         </section>
     </section>
     <section>
@@ -491,6 +565,7 @@ goog.inherits(WeatherDemo.control.Single, mvc.Control);</code></pre>
             <li>Use Closure Stylesheets (coming soon in plovr)</li>
             <li>'-' separator</li>
             <li>goog.getCssName()</li>
+            <li>{css className} in templates</li>
         </ul>
 <pre><code contenteditable>// renaming separated by -
 
@@ -519,19 +594,29 @@ Found 8 errors, including 0 new errors, in 5 files (2 files OK).
         </section>
     </section>
     <section>
-        <h2>What's next?</h2>
-        <ul>
-            <li>Join the <a href="http://www.meetup.com/Closure-Tools/">Meetup</a></li>
-            <li>Discuss on the <a href="https://groups.google.com/forum/?fromgroups#!forum/closure-library-discuss">boards</a></li>
-            <li>Read the <a href="http://closure-library.googlecode.com/svn/docs/index.html">documentation</a> (use file index)</li>
-        </ul>
+        <section>
+            <h2>What's next?</h2>
+            <ul>
+                <li>Join the <a href="http://www.meetup.com/Closure-Tools/">Meetup</a></li>
+                <li>Discuss on the <a href="https://groups.google.com/forum/?fromgroups#!forum/closure-library-discuss">boards</a></li>
+                <li>Read the <a href="http://closure-library.googlecode.com/svn/docs/index.html">documentation</a> (use file index)</li>
+                <li><a href="http://code.google.com/p/closure-library/wiki/RelatedProjects">Related projects</a>:</li>
+                <ul>
+                    <li><a href="http://google-opensource.blogspot.de/2012/08/leak-finder-new-tool-for-javascript.html">Leak Finder</a></li>
+                    <li><a href="https://github.com/Steida/este">este</a></li>
+                </ul>
+            </ul>
+        </section>
+        <section>
+            <h2>Buy this book!</h2>
+            <a href="http://www.amazon.com/gp/product/1449381871"><img src="cover_big.png" /></a>
+        </section>
     </section>
     <section>
         <h2>Questions?</h2>
         <div>Rhys Brett-Bowen</div>
         <ul>
             <li><a href="http://rhysbrettbowen.com">http://rhysbrettbowen.com</a></li>
-            <li>email: <a href="mailto:rhysbrettbowen@gmail.com">rhysbrettbowen@gmail.com</a></li>
             <li>twitter: <a href="https://twitter.com/RhysBB">@RhysBB</a></li>
             <li><a href="https://plus.google.com/109445215696684436299">Google+</a></li>
         </ul>
