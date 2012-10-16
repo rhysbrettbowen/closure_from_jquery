@@ -1,0 +1,896 @@
+<!doctype html>  
+<html lang="en">
+	
+	<head>
+		<meta charset="utf-8">
+		
+		<title>Closure from jQuery - starting Closure Tools</title>
+
+		<meta name="description" content="A framework for easily creating beautiful presentations using HTML">
+		<meta name="author" content="Hakim El Hattab">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+		
+		<link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+		
+		<link rel="stylesheet" href="css/main.css">
+		<link rel="stylesheet" href="css/theme/default.css" id="theme">
+
+		<!-- For syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<script>
+			// If the query includes 'print-pdf' we'll use the PDF print sheet
+			document.write( '<link rel="stylesheet" href="css/print/' + ( window.location.search.match( /print-pdf/gi ) ? 'pdf' : 'paper' ) + '.css" type="text/css" media="print">' );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+	
+	<body>
+		
+		<div class="reveal">
+
+			<!-- Used to fade in a background when a specific slide state is reached -->
+			<div class="state-background"></div>
+			
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+    <section>
+        <h1>Finding Closure from jquery</h1>
+        <div>Starting to use Closure Tools with:</div>
+        <div>
+            <br>
+        </div>
+        <a href="http://plovr.com">plovr</a> - 
+        <a href="https://github.com/rhysbrettbowen/PlastronJS">PlastronJS</a> - 
+        <a href="https://github.com/rhysbrettbowen/G-closure">the G</a>
+    </section>
+    <section>
+        <h2>
+            Who is this guy?
+        </h2>
+        <div>
+            Rhys Brett-Bowen
+        </div>
+        <ul>
+            <li class="fragment">Australian</li>
+            <li class="fragment">Web App lead at <a href="http://catch.com">Catch.com</a></li>
+            <li class="fragment">Started <a href="http://www.meetup.com/Closure-Tools/">Closure Tools Meetup</a></li>
+            <li class="fragment">Wrote <a href="https://github.com/rhysbrettbowen/PlastronJS">PlastronJS</a>, <a href="https://github.com/rhysbrettbowen/G-closure">The G</a>, <a href="https://github.com/rhysbrettbowen/Loader">and</a> <a href="https://github.com/rhysbrettbowen/closure-widgets">some</a> <a href="https://github.com/rhysbrettbowen/functional-closure">others</a></li>
+            <li class="fragment">Someone who found <font color="#ff0099">Closure</font></li>
+        </ul>
+    </section>
+    <section>
+        <h2>Who are you?</h2>
+        <ul>
+            <li class="fragment">Heard of Closure?</li>
+            <li class="fragment">Tried Closure?</li>
+            <li class="fragment">... and gave up?</li>
+            <li class="fragment">know jQuery?</li>
+            <li class="fragment">how about an MV*?</li>
+        </ul>
+    </section>
+    <section>
+        <section>
+            <h2>Closure Compiler</h2>
+            <h3>Advanced Optimizations</h3>
+            <ul>
+                <li>Aggressive renaming</li>
+                <li>Dead code removal</li>
+                <li>Function inlining</li>
+            </ul>
+        </section>
+        <section>
+            <h2>What does this mean?</h2>
+            <ul>
+                <li class="fragment">More code - less bytes</li>
+                <li class="fragment">We can be verbose - the code won't be</li>
+                <li class="fragment">We can use longer name(space)s</li>
+                <li class="fragment">Unused code is removed</li>
+                <li class="fragment">Code will run faster</li>
+            </ul>
+        </section>
+    </section>
+    <section>
+        <section>
+            <h2>What's the catch?</h2>
+            <div>Code must be AO compatible</div>
+            <ul class="fragment">
+                <li>foo['bar'] !== foo.bar</li>
+                <li>{foo: 'bar'} becomes {a: 'bar'}</li>
+                <li>but {'foo': 'bar'} stays {'foo': 'bar'}</li>
+            </ul>
+            <div class="fragment">
+                Use property when internal only and strings when value is external. <a href="http://rhysbrettbowen.com/2012/05/dot-vs-square-bracket-notations-in.html">Read more</a>
+            </div>
+        </section>
+        <section>
+            <h2>What's the catch?</h2>
+            <div>Code must be AO compatible</div>
+<pre><code>var Class = function() {};
+Class.number = 1;</code></pre>
+            <ul>
+                <li class="fragment">must provide Class.number to use externally (enums)</li>
+                <li class="fragment">provide access through prototype</li>
+                <li class="fragment">put under another namespace</li>
+            </ul>
+        </section>
+        <section>
+            <h2>What about using libraries that aren't compatible...</h2>
+            <ul>
+                <li><a href="https://developers.google.com/closure/compiler/docs/api-tutorial3#externs">externs</a></li>
+                <ul>
+                    <li><a href="http://code.google.com/p/closure-compiler/source/browse/trunk/contrib/externs/">some extern files</a></li>
+                </ul>
+                <li>Closure Library</li>
+            </ul>
+        </section>
+    </section>
+    <section>
+        <section>
+            <h2>Closure Library</h2>
+            <div>Built for the compiler</div>
+            <ul>
+                <li>Classical inheritance</li>
+                <li>Type annotations</li>
+                <li>Dependency management</li>
+                <li>goog.ui.Component</li>
+            </ul>
+        </section>
+        <section>
+            <h2>Classical inheritance</h2>
+<pre><code>goog.provide('Class');
+goog.require('Super');
+/**
+ * @constructor
+ * @extends {Super}
+ */
+Class = function() {
+    goog.base(this);
+};
+goog.inherits(Class, Super);
+
+/**
+ * @inheritDoc
+ */
+Class.prototype.method = function(arg) {
+    return goog.base(this, 'method', arg);
+};
+</code></pre>
+        </section>
+        <section>
+            <h2>Type annotations</h2>
+            <ul>
+                <li><a href="https://developers.google.com/closure/compiler/docs/js-for-compiler">Annotating</a></li>
+                <li>Optional... mostly</li>
+                <li>Don't need to be explicit</li>
+            </ul>
+            <div class="fragment">We'll see some in the code</div>
+        </section>
+        <section>
+            <h2>Dependency management</h2>
+<pre><code>goog.provide('namespace');
+goog.require('othernamespace');
+</code></pre>
+            <div class="fragment">uncompiled</div>
+            <ul class="fragment">
+                <li>provide will create the objects needed for the namespace if they don't exist</li>
+                <li>require will write in the dependency if it hasn't been already</li>
+                <li>a file should be created matching up namespaces to files (depswriter.py - or let plovr do it)</li>
+            </ul>
+            <div class="fragment">compiled</div>
+            <ul class="fragment">
+                <li>compiler will include all dependencies in a single file in the correct order</li>
+            </ul>
+            <div class="fragment">want Dependency Injection? try <a href="http://rhysbrettbowen.com/2012/10/dependency-injection-in-closure-ioc.html">Loader</a></div>
+        </section>
+    </section>
+    <section>
+        <section>
+            <h2>goog.ui.component</h2>
+            <ul>
+                <li>What we build our application out of</li>
+                <li>javascript as it's added - <a href="https://plus.google.com/116910304844117268718/posts/UkaymyuTzaF">no more  waiting for $(documnet).ready</a></li>
+                <li>Control those zombie references (extends <a href="http://closure-library.googlecode.com/svn/docs/class_goog_Disposable.html">disposable</a> &amp; <a href="http://closure-library.googlecode.com/svn/docs/class_goog_events_EventTarget.html">eventTarget</a>)</li>
+                <li>Can render new HTML and/or Decorate existing DOM structure</li>
+                <li>Create a heirarchy</li>
+            </ul>
+        </section>
+        <section>
+            <h2>goog.ui.component</h2>
+            <div>Render</div>
+            <ul>
+                <li>render()</li>
+                <ul>
+                    <li>createDom()</li>
+                    <li>enterDocument()</li>
+                </ul>
+            </ul>
+            <div>... some time later ...</div>
+            <ul>
+                <li>dispose()</li>
+                <ul>
+                    <li>disposeInternal()</li>
+                    <li>exitDocument()</li>
+                </ul>
+            </ul>
+        </section>
+        <section>
+            <h2>goog.ui.component</h2>
+            <div>Decorate</div>
+            <ul>
+                <li>decorate()</li>
+                <ul>
+                    <li>canDecorate()</li>
+                    <li>decorateInternal()</li>
+                    <li>enterDocument()</li>
+                </ul>
+            </ul>
+            <div>... some time later ...</div>
+            <ul>
+                <li>dispose()</li>
+                <ul>
+                    <li>disposeInternal()</li>
+                    <li>exitDocument()</li>
+                </ul>
+            </ul>
+        </section>
+        <section>
+            <h2>goog.ui.component</h2>
+            <div>Children</div>
+            <ul>
+                <li>addChild(child, opt_render);</li>
+                <ul>
+                    <li>Will render to getContentElement()</li>
+                    <li>Optionally render manually to another element</li>
+                </ul>
+                <li>removeChild(child, opt_unrender);</li>
+                <ul>
+                    <li>Optionally call exitDocument and remove node</li>
+                </ul>
+            </ul>
+        </section>
+    </section>
+    <section>
+        <h2>WeatherDemo</h2>
+        <h3>Now we've got the basics - let's code!</h3>
+        <ul>
+            <li>Displays cities with temperature</li>
+            <li>Temperature in farenheit and celcius</li>
+            <li>Can change city name and temperature</li>
+            <li>Can add new cities</li>
+            <li>Display cities in alpha or temp order</li>
+            <li>Display blue or red if temperature is cold or hot</li>
+            <li>Use temperature to place city on X-axis</li>
+        </ul>
+    </section>
+    <section>
+        <section>
+            <h2>Setup with Plovr</h2>
+            <ul>
+                <li class="fragment">bundles compiler, templates and library</li>
+                <li class="fragment">Simple configuration</li>
+                <li class="fragment">Test runner</li>
+                <li class="fragment">Documentation generation</li>
+                <li class="fragment">Modules</li>
+            </ul>
+        </section>
+        <section>
+            <h2>WeatherDemo config</h2>
+<pre><code>{
+    "id": "weatherdemo",
+    "paths": ["js/", "lib/", "templates/"],
+    "inputs": "js/main.js",
+    "mode": "ADVANCED",
+    "level": "VERBOSE",
+    "output_file": "compiled.js"
+}</code></pre>
+        </section>
+        <section>
+            <h2>add in to project</h2>
+            <div class="fragment">
+                <div>add in to index.html</div>
+<pre><code>&lt;!-- or mode=compile -->
+&lt;script src="http://localhost:9810/compile?id=weatherdemo&mode=raw">&lt;/script></code></pre>
+                <div>run from the command line</div>
+<pre><code>java -jar plovr.jar serve weatherdemo.json</code></pre>
+                <div>Done!</div>
+            </div>
+            <div class="fragment">
+                <div>... or create the compiled js file</div>
+<pre><code>java -jar plovr.jar build weatherdemo.json</code></pre>
+            </div>
+        </section>
+    </section>
+    <section>
+        <h2>Setup a main function</h2>
+        <div>main.js</div>
+<pre><code>goog.provide('WeatherDemo.main');
+WeatherDemo.main = function() {};
+// stops the name from compiling
+goog.exportSymbol('WeatherDemo.main', WeatherDemo.main);</code></pre>
+        <div>index.html</div>
+<pre><code>&lt;script>WeatherDemo.main();&lt;/script></code></pre>
+    </section>
+    <section>
+        <section>
+            <h2>Back to jQuery</h2>
+            <div>jQuery has a great interface</div>
+            <pre><code contenteditable>
+$('.class').children().addClass('classChilren');
+            </code></pre>
+        </section>
+        <section>
+            <h2>Closure Library...</h2>
+            <ul>
+                <li class="fragment">Namespacing great for discoverability</li>
+                <li class="fragment">Functional instead of OO</li>
+            </ul>
+            <div class="fragment"v>but...
+            <pre><code contenteditable>
+goog.array.forEach(
+    goog.dom.getChildren(goog.dom.getElementByClass('class')),
+        function(child) {
+            goog.dom.classes.add(child, 'classChildren');
+        });
+            </code></pre>
+        </div>
+        </section>
+        <section>
+            <h2>Learn a new library?</h2>
+            <div>or just use an interface...</div>
+            <pre><code contenteditable>
+$('.class').children().addClass('classChilren');
+            </code></pre>
+            <div class="fragment">The G!</div>
+        </section>
+    </section>
+    <section>
+        <h2>Using the G</h2>
+<pre><code>goog.require('G');</code></pre>
+        <ul>
+            <li class="fragment">Just like jQuery - almost</li>
+            <li class="fragment">use $$.method instead of $.method</li>
+            <li class="fragment">$$.setSelectorEngine(engine) for better selector support</li>
+            <ul class="fragment">
+                <li><a href="http://closure-library.googlecode.com/svn/docs/closure_third_party_closure_goog_dojo_dom_query.js.html">goog.dom.query</a></li>
+                <li><a href="http://sizzlejs.com">Sizzle</a></li>
+                <li><a href="https://github.com/ded/qwery">Qwery</a></li>
+            </ul>
+            <li class="fragment">Even some jQuery plugins may work - just add to $.fn</li>
+        </ul>
+    </section>
+    <section>
+        <section>
+            <h2>PlastronJS</h2>
+            <div>MVC for Closure Library</div>
+            <ul>
+                <li>Define schemas on models</li>
+                <li>Controls built on goog.ui.component</li>
+                <li>Control level event system</li>
+                <li>Convenient model bindings</li>
+                <li>Mediator</li>
+                <li>Store</li>
+            </ul>
+        </section>
+        <section>
+            <h2>Schema</h2>
+<pre><code>WeatherDemo.model.City.Schema = {
+  'celcius': {
+    get: function(temp) {
+      return 5 / 9 * (temp - 32);
+    },
+    /** @this {mvc.Model} */
+    set: function(num, opt_silent) {
+      this.set('temp', num * 9 / 5 + 32, opt_silent);
+    },
+    require: ['temp']
+  }
+};</code></pre>
+            <ul class="fragment">
+                <li>models: true</li>
+                <li>cmp: function(*, *): boolean</li>
+            </ul>
+        </section>
+        <section>
+            <h2>Using inheritance</h2>
+            <div>Inherit from mvc.Model</div>
+<pre class="fragment"><code>/**
+ * @constructor
+ * @extends {mvc.Model}
+ * @inheritDoc
+ */
+WeatherDemo.model.City = function(opt_options) {
+  opt_options = opt_options || {};
+  GG.extend(opt_options, {
+    'schema': WeatherDemo.model.City.Schema
+  });
+  goog.base(this, opt_options);
+};
+goog.inherits(WeatherDemo.model.City, mvc.Model);</code></pre>
+        </section>
+        <section>
+            <h2>Using Inheritance</h2>
+            <div>your control inherits from mvc.Control inherits from goog.ui.Component</div>
+<pre class="fragment"><code>/**
+ * @constructor
+ * @extends {mvc.Control}
+ * @inheritDoc
+ */
+WeatherDemo.control.Single = function(model) {
+  goog.base(this, model);
+};
+goog.inherits(WeatherDemo.control.Single, mvc.Control);</code></pre>
+        </section>
+        <section>
+            <h2>Control events</h2>
+            <ul>
+                <li class="fragment">All control events use event delegation (to root element)</li>
+                <li class="fragment">Handlers are fired based on priority first (then order)</li>
+                <li class="fragment">returns an object that can .fire() the handler and .off()</li>
+            </ul>
+<pre class="fragment"><code>this.on(eventType, fn, opt_selector, opt_handler, opt_priority).fire();</code></pre>
+<pre class="fragment"><code>this.click(function() { this.broadcast('chooseCity', this.getModel().get('id'));});</code></pre>
+<pre class="fragment"><code>this.on(goog.events.EventType.KEYUP, function(e) {
+    if (e.keyCode === goog.events.KeyCodes.ENTER) {
+      e.target.blur();
+    }
+  }, 'input');</code></pre>
+        </section>
+        <section>
+            <h2>Convenient model bindings</h2>
+            <ul class="fragment">
+                <li>bind methods bind to model (and return bound event objects)</li>
+                <ul>
+                    <li>this.bind - mvc.Model</li>
+                    <li>this.bindAll - mvc.Model</li>
+                    <li>this.modelChange - mvc.Collection</li>
+                    <li>this.anyModelChange - mvc.Collection</li>
+                </ul>
+                <li class="fragment">autmoatically clears bindings when disposed</li>
+                <li class="fragment">setModel() will change bindings to the new model</li>
+            </ul>
+<pre class="fragment"><code>single.setModel(WeatherDemo.Store.get(id));</code></pre>
+        </section>
+        <section>
+            <h2>Autobind!</h2>
+            <div>two way binding configuration</div>
+            <ul>
+                <li>can take a template string or object</li>
+                <li>can bind:</li>
+                <ul>
+                    <li>classes</li>
+                    <li>html</li>
+                    <li>visibility</li>
+                </ul>
+            </ul>
+<pre class="fragment"><code>this.autobind('.temp', '{$temp}');</code></pre>
+<pre class="fragment"><code>this.autobind('', {
+    reqs: ['celcius'],
+    reqClass: ['hot', 'mild'],
+    chooseClass: function(celcius) {
+      if (celcius > 30) return 'hot';
+      if (celcius < 20) return 'mild';
+    }
+});</code></pre>
+        </section>
+        <section>
+            <h2>Autolist!</h2>
+            <ul>
+                <li>automatically keep list up to date on screen</li>
+                <li>can override display with placeChild_</li>
+            </ul>
+<pre class="fragment"><code>this.autolist(WeatherDemo.control.Simple, content);</code></pre>
+<pre class="fragment"><code>WeatherDemo.control.List.prototype.placeChild_ = function(
+    contentEl, child, index) {
+  $(child.getElement()).css({
+    'top': index * 45
+  });
+};</code></pre>
+        </section>
+        <section>
+            <h2>Mediator</h2>
+            <ul>
+                <li>app wide messaging</li>
+                <li>namespace messages</li>
+                <li>can register objects to broadcast, then will decorate with broadcast method</li>
+                <li>can initialize and dispose based on available message</li>
+                <li>message matching with customizable wildcards</li>                
+            </ul>
+<pre class="fragment"><code>WeatherDemo.Mediator.register(this, 'chooseCity');
+// then
+this.broadcast('chooseCity', this.getModel().get('id'));</code></pre>
+<pre class="fragment"><code>WeatherDemo.Mediator.on('chooseCity', function(id) {...});</code></pre>
+        </section>
+        <section>
+            <h2>Store</h2>
+            <ul>
+                <li>single store for retrieval of models</li>
+                <li>can create models given a type</li>
+                <li>will retrieve models given an id (and update new models id when given)</li>
+            </ul>
+<pre class="fragment"><code>WeatherDemo.Store = new mvc.Store(WeatherDemo.model.City);</code></pre>
+<pre class="fragment"><code>WeatherDemo.Store.get(city['id']);</code></pre>
+        </section>
+    </section>
+    <section>
+        <h1>Let's see some code</h1>
+    </section>
+    <section>
+        <section>
+            <h2>More tools!</h2>
+            <ul>
+                <li>templates</li>
+                <li>linting</li>
+                <li>stylesheets</li>
+                <li>class minification</li>
+                <li>testing</li>
+            </ul>
+        </section>
+        <section>
+            <h2><a href="https://developers.google.com/closure/templates">Closure Templates</a></h2>
+            <ul>
+                <li>Compiled</li>
+                <li>Extensible functions</li>
+                <li>Client and Server-side</li>
+                <li>Translatable strings</li>
+            </ul>
+        </section>
+        <section>
+            <h2><a href="https://developers.google.com/closure/utilities">Closure Linter</a></h2>
+            <ul>
+                <li>lints for the <a href="http://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml">Google Javascript Style Guide</a></li>
+                <li>Strict mode for contributing to Closure Library</li>
+                <li>Style fixer</li>
+            </ul>
+        </section>
+        <section>
+            <h2><a href="http://code.google.com/p/closure-stylesheets/">Closure Stylesheets</a></h2>
+            <ul>
+                <li>Variables</li>
+                <li>Extensible functions</li>
+                <li>Mixins</li>
+                <li>Conditionals</li>
+                <li>Minification (<font color="#ff0099">including class name</font>)</li>
+                <li>Linting</li>
+            </ul>
+        </section>
+        <section>
+            <h2>Class minification</h2>
+        <ul>
+            <li>Use Closure Stylesheets (coming soon in plovr)</li>
+            <li>'-' separator</li>
+            <li>goog.getCssName()</li>
+            <li>{css className} in templates</li>
+        </ul>
+<pre><code contenteditable>// renaming separated by -
+
+goog.getCssName('class-subclass') ==
+    goog.getCssName('class') + '-' + goog.getCssName('sublcass');
+
+// select by class in The G and PlastronJS
+
+$(goog.getCssName('-class'));</code></pre>
+        </section>
+        <section>
+            <h2>Linting</h2>
+            <div class="fragment">gjslint -r js</div>
+<pre class="fragment"><code>
+...
+Found 17 errors, including 1 new errors, in 7 files (0 files OK).
+
+... The script can be run by executing: fixjsstyle -r js 
+</code></pre>
+        <div class="fragment">fixjsstyle -r js</div>
+        <br />
+        <div class="fragment">gjslint -r js</div>
+<pre class="fragment"><code>...
+Found 8 errors, including 0 new errors, in 5 files (2 files OK).
+</code></pre>
+        </section>
+    </section>
+    <section>
+        <section>
+            <h2>What's next?</h2>
+            <ul>
+                <li>Join the <a href="http://www.meetup.com/Closure-Tools/">Meetup</a></li>
+                <li>Discuss on the <a href="https://groups.google.com/forum/?fromgroups#!forum/closure-library-discuss">boards</a></li>
+                <li>Read the <a href="http://closure-library.googlecode.com/svn/docs/index.html">documentation</a> (use file index)</li>
+                <li><a href="http://code.google.com/p/closure-library/wiki/RelatedProjects">Related projects</a>:</li>
+                <ul>
+                    <li><a href="http://google-opensource.blogspot.de/2012/08/leak-finder-new-tool-for-javascript.html">Leak Finder</a></li>
+                    <li><a href="https://github.com/Steida/este">este</a></li>
+                </ul>
+            </ul>
+        </section>
+        <section>
+            <h2>Buy this book!</h2>
+            <a href="http://www.amazon.com/gp/product/1449381871"><img src="cover_big.png" /></a>
+        </section>
+    </section>
+    <section>
+        <h2>Questions?</h2>
+        <div>Rhys Brett-Bowen</div>
+        <ul>
+            <li><a href="http://rhysbrettbowen.com">http://rhysbrettbowen.com</a></li>
+            <li>twitter: <a href="https://twitter.com/RhysBB">@RhysBB</a></li>
+            <li><a href="https://plus.google.com/109445215696684436299">Google+</a></li>
+        </ul>
+    </section>
+
+    <!--
+    <section>
+        <section>
+            <h2>Closure Tools</h2>
+            <div>
+                <a href="https://developers.google.com/closure/compiler/">Closure Compiler</a>
+            </div>
+            <ul>
+                <li>Aggressive renaming</li>
+                <li>Dead code removal</li>
+                <li>Function inlining</li>
+            </ul>
+        </section>
+        <section>
+            <h2>Closure Tools</h2>
+            <div><a href="https://developers.google.com/closure/library">Closure Library</a></div>
+            <ul>
+                <li>Namespaces</li>
+                <li>Dependancy management</li>
+                <li>Inheritance</li>
+                <li>goog.ui.component (later)</li>
+            </ul>
+        </section>
+        <section>
+            <h2>Closure Tools</h2>
+            <div><a href="https://developers.google.com/closure/templates">Closure Templates</a></div>
+            <ul>
+                <li>Compiled</li>
+                <li>Extensible functions</li>
+                <li>Client and Server-side</li>
+                <li>Translatable strings</li>
+            </ul>
+        </section>
+        <section>
+            <h2>Closure Tools</h2>
+            <div><a href="http://code.google.com/p/closure-stylesheets/">Closure Stylesheets</a></div>
+            <ul>
+                <li>Variables</li>
+                <li>Extensible functions</li>
+                <li>Mixins</li>
+                <li>Conditionals</li>
+                <li>Minification (<font color="#ff0099">including class name</font>)</li>
+                <li>Linting</li>
+            </ul>
+        </section>
+        <section>
+            <h2>Closure Tools</h2>
+            <div><a href="https://developers.google.com/closure/utilities">Closure Linter</a></div>
+            <ul>
+                <li>lints for the <a href="http://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml">Google Javascript Style Guide</a></li>
+                <li>Strict mode for contributing to Closure Library</li>
+                <li>Style fixer</li>
+            </ul>
+        </section>
+    </section>
+    <section>
+        <h2>Why do you care?</h2>
+        <div>ADVANCED Optimizations</div>
+        <ul>
+            <li class="fragment">More code - less bytes</li>
+            <li class="fragment">We can be verbose - the code won't be</li>
+            <li class="fragment">We can use longer name(space)s</li>
+            <li class="fragment">Unused code is removed</li>
+            <li class="fragment">Code will run faster</li>
+        </ul>
+    </section>
+    <section>
+        <h2>What's the catch</h2>
+        <div>Code must be AO compatible</div>
+        <ul class="fragment">
+            <li>foo['bar'] !== foo.bar</li>
+            <li>{foo: 'bar'} becomes {a: 'bar'}</li>
+            <li>but {'foo': 'bar'} stays {'foo': 'bar'}</li>
+        </ul>
+        <div class="fragment">Use property when internal only and strings when value is external</div>
+        <div class="fragment">What about using libraries that aren't compatible...</div>
+    </section>
+    <section>
+        <h2>Closure Library</h2>
+        <ul>
+            <li>AO compatible</li>
+            <li>Namespaced</li>
+            <li>Designed to compress well</li>
+            <li>Backwards compatible</li>
+            <li>Built to work with the compiler</li>
+            <ul>
+                <li>Dependancy management</li>
+                <li>Type annotations</li>
+            </ul>
+        </ul>
+    </section>
+    <section>
+        <section>
+            <h2>goog.ui.component</h2>
+            <div>Render</div>
+            <ul>
+                <li>render()</li>
+                <ul>
+                    <li>createDom()</li>
+                    <li>enterDocument()</li>
+                </ul>
+            </ul>
+            <div>... some time later ...</div>
+            <ul>
+                <li>dispose()</li>
+                <ul>
+                    <li>disposeInternal()</li>
+                    <li>exitDocument()</li>
+                </ul>
+            </ul>
+        </section>
+        <section>
+            <h2>goog.ui.component</h2>
+            <div>Decorate</div>
+            <ul>
+                <li>decorate()</li>
+                <ul>
+                    <li>canDecorate()</li>
+                    <li>decorateInternal()</li>
+                    <li>enterDocument()</li>
+                </ul>
+            </ul>
+            <div>... some time later ...</div>
+            <ul>
+                <li>dispose()</li>
+                <ul>
+                    <li>disposeInternal()</li>
+                    <li>exitDocument()</li>
+                </ul>
+            </ul>
+        </section>
+        <section>
+            <h2>goog.ui.component</h2>
+            <div>Children</div>
+            <ul>
+                <li>addChild(child, opt_render);</li>
+                <ul>
+                    <li>Will render to getContentElement()</li>
+                    <li>Optionally render manually to another element</li>
+                    <li>Calls addChildAt(child, index, opt_render)</li>
+                </ul>
+                <li>removeChild(child, opt_unrender);</li>
+                <ul>
+                    <li>Optionally call exitDocument and remove node</li>
+                </ul>
+            </ul>
+        </section>
+    </section>
+    <section>
+        <h2>Plovr</h2>
+        <ul>
+            <li class="fragment">bundles compiler, templates and library</li>
+            <li class="fragment">Simple configuration</li>
+            <li class="fragment">test runner</li>
+            <li class="fragment">documentation generation</li>
+            <li class="fragment">modules</li>
+        </ul>
+    </section>
+    <section>
+        <section>
+            <h2>Learn a new library?</h2>
+            <div>jQuery is a good interface</div>
+            <pre><code contenteditable>
+$('.class').children().addClass('classChilren');
+            </code></pre>
+        </section>
+        <section>
+            <h2>Learn a new library?</h2>
+            <div>Closure Library...</div>
+            <pre><code contenteditable>
+goog.array.forEach(
+    goog.dom.getChildren(goog.dom.getElementByClass('class')),
+        function(child) {
+            goog.dom.classes.add(child, 'classChildren');
+        });
+            </code></pre>
+        </section>
+        <section>
+            <h2>Learn a new library?</h2>
+            <div>The G!</div>
+            <pre><code contenteditable>
+$('.class').children().addClass('classChilren');
+            </code></pre>
+        </section>
+    </section>
+    <section>
+        <h2>PlastronJS</h2>
+        <div>MVC framework built on Closure Tools</div>
+        <ul>
+            <li>Define schemas on models</li>
+            <li>Controls built on goog.ui.component</li>
+            <li>Control level event system</li>
+            <li>Bound event objects</li>
+            <li>Convenience methods</li>
+            <li>Mediator</li>
+            <li>Store</li>
+        </ul>
+    </section>
+    <section>
+        <h1>Let's see some code</h1>
+    </section>
+    <section>
+        <h2>Class minification</h2>
+        <ul>
+            <li>Use Closure Stylesheets (coming soon in plovr)</li>
+            <li>'-' separator</li>
+            <li>goog.getCssName()</li>
+        </ul>
+<pre><code contenteditable>// renaming separated by -
+
+goog.getCssName('class-subclass') ==
+    goog.getCssName('class') + '-' + goog.getCssName('sublcass');
+
+// select by class in The G and PlastronJS
+
+$(goog.getCssName('-class'));
+</code></pre>
+    </section>
+    <section>
+        <h2>What's next?</h2>
+        <ul>
+            <li>Join the <a href="http://www.meetup.com/Closure-Tools/">Meetup</a></li>
+            <li>Discuss on the <a href="https://groups.google.com/forum/?fromgroups#!forum/closure-library-discuss">boards</a></li>
+            <li>Read the <a href="http://closure-library.googlecode.com/svn/docs/index.html">documentation</a> (use file index)</li>
+        </ul>
+    </section> -->
+    
+</div>
+
+			<!-- The navigational controls UI -->
+			<aside class="controls">
+				<a class="left" href="#">&#x25C4;</a>
+				<a class="right" href="#">&#x25BA;</a>
+				<a class="up" href="#">&#x25B2;</a>
+				<a class="down" href="#">&#x25BC;</a>
+			</aside>
+
+			<!-- Presentation progress bar -->
+			<div class="progress"><span></span></div>
+			
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.min.js"></script>
+
+		<script>
+			
+			// Full list of configuration options available here:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				
+				theme: Reveal.getQueryHash().theme || 'default', // available themes are in /css/theme
+				transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/linear(2d)
+
+				// Optional libraries used to extend on reveal.js
+				dependencies: [
+					{ src: 'lib/js/highlight.js', async: true, callback: function() { window.hljs.initHighlightingOnLoad(); } },
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'lib/js/showdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'lib/js/data-markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: '/socket.io/socket.io.js', async: true, condition: function() { return window.location.host === 'localhost:1947'; } },
+					{ src: 'plugin/speakernotes/client.js', async: true, condition: function() { return window.location.host === 'localhost:1947'; } },
+				]
+			});
+			
+		</script>
+
+	</body>
+</html>
