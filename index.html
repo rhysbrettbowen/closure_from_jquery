@@ -353,8 +353,46 @@ $('.class').children().addClass('classChilren');
             <img src="plastronjs.png" alt="">
         </section>
         <section>
-            <div>mvc.Control built on goog.ui.component</div>
-            <img src="lifecycle.png" alt="">
+            <h2>Schema for models</h2>
+<pre><code contenteditable>WeatherDemo.model.City.Schema = {
+  'celcius': {
+    get: function(temp) {
+      return 5 / 9 * (temp - 32);
+    },
+    /** @this {mvc.Model} */
+    set: function(num, opt_silent) {
+      this.set('temp', num * 9 / 5 + 32, opt_silent);
+    },
+    require: ['temp']
+  }
+};</code></pre>
+<div class="fragment">or convenience functions
+<pre><code contenteditable>this.alias('farenheit', 'temp');</code></pre></div>
+            <div class="fragment">read <a href="https://github.com/rhysbrettbowen/PlastronJS/blob/master/README.md">documentation</a> for more</div>
+        </section>
+        <section>
+            <h2>Mediator</h2>
+            <ul>
+                <li>app wide messaging</li>
+                <li>namespace messages</li>
+                <li>can register objects to broadcast, then will decorate with broadcast method</li>
+                <li>can initialize and dispose based on available message</li>
+                <li>message matching with customizable wildcards</li>                
+            </ul>
+<pre class="fragment"><code contenteditable>WeatherDemo.Mediator.register(this, 'chooseCity');
+// then
+this.broadcast('chooseCity', this.getModel().get('id'));</code></pre>
+<pre class="fragment"><code contenteditable>WeatherDemo.Mediator.on('chooseCity', function(id) {...});</code></pre>
+        </section>
+        <section>
+            <h2>Store</h2>
+            <ul>
+                <li>single store for retrieval of models</li>
+                <li>can create models given a type</li>
+                <li>will retrieve models given an id (and update new models id when given)</li>
+            </ul>
+<pre class="fragment"><code contenteditable>WeatherDemo.Store = new mvc.Store(WeatherDemo.model.City);</code></pre>
+<pre class="fragment"><code contenteditable>WeatherDemo.Store.get(city['id']);</code></pre>
         </section>
     </section>
     <section>
@@ -373,6 +411,25 @@ $('.class').children().addClass('classChilren');
                     <li>can handle models and collections</li>
                 </ul>
             </ul>
+        </section>
+        <section>
+            <h2>2 types of component</h2>
+<pre class="fragment"><code>// render to create a component DOM structure
+myComponent.render(el);
+
+// this will fire:
+myComponent.createDom(); // create the DOM structure, and set this.element_;</code></pre>
+<pre class="fragment"><code>// decorate to use existing DOM structure
+myComponent.decorate(el);
+
+// this will fire:
+myComponent.canDecorate(el);// return if DOM structure is eligible
+myComponent.decorateInternal(el); // any transforms on the DOOM needed</code></pre>
+        <div class="fragment">Then enterDocument() will fire.</div>
+        </section>
+        <section>
+            <div>Component Lifecycle</div>
+            <img src="lifecycle.png" alt="">
         </section>
         <section>
             <h2>Control events</h2>
@@ -397,24 +454,6 @@ $('.class').children().addClass('classChilren');
                 <li class="fragment">setModel() will change bindings to the new model
 <pre><code contenteditable>single.setModel(WeatherDemo.Store.get(id));</code></pre></li>
             </ul>
-        </section>
-        <section>
-            <h2>Schema for models</h2>
-<pre><code contenteditable>WeatherDemo.model.City.Schema = {
-  'celcius': {
-    get: function(temp) {
-      return 5 / 9 * (temp - 32);
-    },
-    /** @this {mvc.Model} */
-    set: function(num, opt_silent) {
-      this.set('temp', num * 9 / 5 + 32, opt_silent);
-    },
-    require: ['temp']
-  }
-};</code></pre>
-<div class="fragment">or convenience functions
-<pre><code contenteditable>this.alias('farenheit', 'temp');</code></pre></div>
-            <div class="fragment">read <a href="https://github.com/rhysbrettbowen/PlastronJS/blob/master/README.md">documentation</a> for more</div>
         </section>
         <section>
             <h2>model bindings</h2>
@@ -462,30 +501,6 @@ $('.class').children().addClass('classChilren');
     'top': index * 45
   });
 };</code></pre></div>
-        </section>
-        <section>
-            <h2>Mediator</h2>
-            <ul>
-                <li>app wide messaging</li>
-                <li>namespace messages</li>
-                <li>can register objects to broadcast, then will decorate with broadcast method</li>
-                <li>can initialize and dispose based on available message</li>
-                <li>message matching with customizable wildcards</li>                
-            </ul>
-<pre class="fragment"><code contenteditable>WeatherDemo.Mediator.register(this, 'chooseCity');
-// then
-this.broadcast('chooseCity', this.getModel().get('id'));</code></pre>
-<pre class="fragment"><code contenteditable>WeatherDemo.Mediator.on('chooseCity', function(id) {...});</code></pre>
-        </section>
-        <section>
-            <h2>Store</h2>
-            <ul>
-                <li>single store for retrieval of models</li>
-                <li>can create models given a type</li>
-                <li>will retrieve models given an id (and update new models id when given)</li>
-            </ul>
-<pre class="fragment"><code contenteditable>WeatherDemo.Store = new mvc.Store(WeatherDemo.model.City);</code></pre>
-<pre class="fragment"><code contenteditable>WeatherDemo.Store.get(city['id']);</code></pre>
         </section>
     </section>
     <section>
@@ -575,6 +590,7 @@ $(goog.getCssName('-class'));</code></pre>
                 <li><a href="http://code.google.com/p/closure-library/wiki/RelatedProjects">Related projects</a>:</li>
                 <ul>
                     <li><a href="http://google-opensource.blogspot.de/2012/08/leak-finder-new-tool-for-javascript.html">Leak Finder</a> - find memory leaks</li>
+                    <li><a href="https://github.com/google/module-server">Module Server</a></li>
                     <li><a href="https://github.com/Steida/este">este</a> - development framework</li>
                     <li>More to come!</li>
                 </ul>
